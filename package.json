@@ -21,11 +21,8 @@
     "mongoose": "^7.3.0",
     "nodemailer": "^6.9.3",
     "nodemon": "^2.0.22",
-    "path": "^0.12.7"
-  }
-    "dotenv": "^16.3.1",
+    "path": "^0.12.7",
     "ethereumjs-testrpc": "^6.0.3",
-    "express": "^4.18.2",
     "web3": "^1.10.0"
   },
   "repository": {
