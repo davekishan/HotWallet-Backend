@@ -32,6 +32,7 @@ const rawTx = {
     
 }
 
+
 const createSignedTx = async(rawTx,email) => {
     try { 
         // console.log(await rawTx.gas);
