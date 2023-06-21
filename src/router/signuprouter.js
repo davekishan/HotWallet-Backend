@@ -38,7 +38,6 @@ signuprouter.post('/signup', async (req, res) => {
     await adduser.save()
     req.session.isAuth = true;
     req.session.email = email;
-    req.session.userId = adduser;
     const confirmationCode = otp;
     req.session.otp = confirmationCode;
     await otpMail(email, confirmationCode);
@@ -57,7 +56,7 @@ signuprouter.post('/verifyotp', async (req, res) => {
     const userses = new UserSession({ email: email, jwt_id: token });
     await userses.save();
 
-    const user = await userModel.findOneAndUpdate({ "email": req.session.email }, { "userStatus": 1 })
+    const user = await userModel.findOneAndUpdate({ "email": email }, { "status": 1 })
     res.json({ success: true, message: "Account Verifyed Successfully" })
   } else {
     res.json({ success: false, message: "Wrong Otp" })
