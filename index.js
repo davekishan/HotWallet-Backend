@@ -16,6 +16,7 @@ const usersignup=require('./src/router/signuprouter')
 
 const dotenv = require('dotenv');
 const loginrouter = require('./src/router/loginroutes');
+const walletrouter=require('./src/router/walletrouter');
 dotenv.config()
 
 const app = express();
@@ -48,7 +49,7 @@ app.use(bodyParser.json());
 
 app.use('/api/login', loginrouter);
 app.use('/api/signup', usersignup);
-
+app.use('/api/wallet',walletrouter);
 
 
 server.listen(3000, async () => {
