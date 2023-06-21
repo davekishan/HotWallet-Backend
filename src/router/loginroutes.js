@@ -51,7 +51,7 @@ loginrouter.post('/login', async (req, res) => {
 loginrouter.get('/logout', async (req, res) => {
   req.session.destroy();
   res.clearCookie("jwt");
-  res.json({ success: true, message: "You Are Loged Out" })
+  res.json({ success: true, message: "You Are Logged Out" })
 })
 
 loginrouter.get('/usernow', (req, res) => {
@@ -70,7 +70,7 @@ loginrouter.get('/checksession', (req, res) => {
 
 loginrouter.post('/adminlogin', (req, res) => {
   const { email, password } = req.body;
-  if (email == "kishan.dave@minddeft.net" && password == "1234") {
+  if (email == "kishan.dave@minddeft.net" && password == "1234") { 
     req.session.email = email;
     
     res.json({ success: true })
