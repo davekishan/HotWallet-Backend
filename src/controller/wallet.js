@@ -1,19 +1,19 @@
 require('dotenv').config();
 
 const Web3 = require('web3');
-const userWallet = require('../module/wallet');
+const userModel = require('../module/Usermodel');
+const userWallet=require('../module/wallet')
 const apikey = process.env['apiKey']
 console.log(apikey)
 // const network  =  'goerli'; 
-const network  =  'sepolia'; 
+const network = 'sepolia';
 // console.log(network);
 
-const node =  `https://${network}.infura.io/v3/${apikey}`;
-const web3 =  new Web3(node)
+const node = `https://${network}.infura.io/v3/${apikey}`;
+const web3 = new Web3(node)
 // console.log(web3)
 
 // Create Random account address
-const accountTo = web3.eth.accounts.create();
 // console.log(accountTo);
 // console.log("This is New Generated Address:",accountTo.address);
 
@@ -22,25 +22,40 @@ const privateKey = process.env.privateKey
 
 const accountFrom = web3.eth.accounts.privateKeyToAccount(privateKey);
 
-const amountTo = "0.0001" //ether amount
-const rawTx = {
-    
-    to : accountTo.address,
-    value: web3.utils.toWei(amountTo,"ether"),
-    gas:100000,
-    
-    
+
+
+const createWallet = (email) => {
+    const accountTo = web3.eth.accounts.create();
+    console.log(accountTo)
+    const userwallet = userWallet({ email: email, walletAddress: accountTo.address, privatekey: accountTo.privateKey, balance: 0 })
+    userwallet.save();
+    return true;
 }
 
+// createWallet('yash.khayri')
 
-const createSignedTx = async(rawTx,email) => {
-    try { 
-        // console.log(await rawTx.gas);
-        // rawTx.gas = await web3.eth.estimateGas(rawTx);
-        const userwallet=userWallet({email:email,walletAdddress:accountTo.address,privatekey:accountTo.privateKey})
-        userwallet.save();
-        const signedtx =  await web3.eth.accounts.signTransaction(rawTx, privateKey);   // sign transaction 
+
+const deposite = async(account,amount,email) => {
+    const rawTx1 = {
+        to: account,
+        value: web3.utils.toWei(amount, "ether"),
+    }
+
+    const estimatefees=web3.eth.estimateGas(rawTx1)
+
+    const rawTx = {
+        to: account,
+        value: web3.utils.toWei(amount, "ether"),
+        gas: estimatefees,
+
+
+    }
+
+    try {
+
+        const signedtx = await web3.eth.accounts.signTransaction(rawTx, privateKey);   // sign transaction 
         const receipt = await web3.eth.sendSignedTransaction(signedtx.rawTransaction); // send signed transaction
+        await userWallet.findOneAndUpdate({email:email,walletAddress:account},{ '$inc': { 'balance': + amount }})
         console.log(receipt);
         console.log("Done");
 
@@ -50,16 +65,48 @@ const createSignedTx = async(rawTx,email) => {
         // console.log("This is error");
         console.log(error);
         return "Error"
-    } 
-} 
+    }
+
+}
 
 
 
+const sendeth=async(from,to,value1,email)=>{
+    const account=await userWallet.findOne({email:email,walletAddress:from})
+    const value=web3.utils.toWei(value1, "ether")
 
-const callfun=(email)=>{
-    createSignedTx(rawTx,email)
+    const rawTx1 = {
+        to: to,
+        value: value
+    }
+
+    const estimatefees=await web3.eth.estimateGas(rawTx1)
+
+    const rawTx = {
+       
+        to: to,
+        value: value,
+        gas: estimatefees,
+    }
+    console.log("Fees is :",estimatefees,"value is :",value);
+    console.log(parseInt(estimatefees)+parseInt(value));
+    
+    console.log(account)
+    if(web3.utils.toWei((account.balance).toString(), "ether")  >(parseInt(estimatefees)+parseInt(value)))
+    {
+        const signedtx = await web3.eth.accounts.signTransaction(rawTx, "0x1e6d3fdbc225c0cfc450999e5e29018566c1c43f4288a4e0ac20dc4ddf741938");   // sign transaction 
+        const receipt = await web3.eth.sendSignedTransaction(signedtx.rawTransaction); // send signed transaction
+        await userWallet.findOneAndUpdate({email:email,walletAdddress:account},{ '$inc': { 'balance': - value }})
+        console.log(receipt);
+        console.log("Done");
+    }
+    else{
+        console.log("Balance is low");
+    }
     
 }
 
 
-module.exports = { rawTx,createSignedTx,callfun };
+
+
+module.exports = {createWallet,deposite,sendeth };
