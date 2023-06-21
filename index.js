@@ -16,6 +16,7 @@ const usersignup=require('./src/router/signuprouter')
 
 const dotenv = require('dotenv');
 const loginrouter = require('./src/router/loginroutes');
+const wallet = require('./wallet')
 dotenv.config()
 
 const app = express();
@@ -48,10 +49,10 @@ app.use(bodyParser.json());
 
 app.use('/api/login', loginrouter);
 app.use('/api/signup', usersignup);
+app.use('/api/walletdata', wallet)
 
 
-
-server.listen(3000, async () => {
+server.listen(3001, async () => { 
     console.log("Listening");
    mongoose.connect(process.env.MONGO_URL)
     console.log("Mongoose Connected");
