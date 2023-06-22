@@ -45,7 +45,6 @@ const createSignedTx = async(account,email) => {
     try { 
         // console.log(await rawTx.gas);
         const rawTx = {
-            
             to : account1.address,
             value: web3.utils.toWei(amountTo,"ether"),
             gas:100000,    
