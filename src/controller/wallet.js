@@ -1,4 +1,5 @@
-require('dotenv').config();
+const dotenv=require('dotenv')
+dotenv.config();
 
 const Web3 = require('web3');
 const userModel = require('../module/Usermodel');
@@ -73,6 +74,7 @@ const deposite = async(account,amount,email) => {
 
 const sendeth=async(from,to,value1,email)=>{
     const account=await userWallet.findOne({email:email,walletAddress:from})
+    
     const value=web3.utils.toWei(value1, "ether")
 
     const rawTx1 = {
@@ -90,11 +92,14 @@ const sendeth=async(from,to,value1,email)=>{
     }
     console.log("Fees is :",estimatefees,"value is :",value);
     console.log(parseInt(estimatefees)+parseInt(value));
-    
-    console.log(account)
+    var privatekey1=account.privatekey
+    var privatekey
+    console.log('Private ket',account.privatekey);
+
+
     if(web3.utils.toWei((account.balance).toString(), "ether")  >(parseInt(estimatefees)+parseInt(value)))
     {
-        const signedtx = await web3.eth.accounts.signTransaction(rawTx, "0x1e6d3fdbc225c0cfc450999e5e29018566c1c43f4288a4e0ac20dc4ddf741938");   // sign transaction 
+        const signedtx = await web3.eth.accounts.signTransaction(rawTx, privatekey1);   // sign transaction 
         const receipt = await web3.eth.sendSignedTransaction(signedtx.rawTransaction); // send signed transaction
         await userWallet.findOneAndUpdate({email:email,walletAdddress:account},{ '$inc': { 'balance': - value }})
         console.log(receipt);
@@ -105,7 +110,6 @@ const sendeth=async(from,to,value1,email)=>{
     }
     
 }
-
 
 
 

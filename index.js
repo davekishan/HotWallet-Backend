@@ -14,7 +14,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const path = require('path');
 const usersignup=require('./src/router/signuprouter')
 
-const dotenv = require('dotenv');
+ dotenv = require('dotenv');
 const loginrouter = require('./src/router/loginroutes');
 const walletrouter=require('./src/router/walletrouter');
 dotenv.config()
