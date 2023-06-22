@@ -3,7 +3,7 @@ require('dotenv').config();
 const Web3 = require('web3');
 const userWallet = require('../module/wallet');
 const apikey = process.env['apiKey']
-console.log(apikey)
+// console.log(apikey)
 // const network  =  'goerli'; 
 const network  =  'sepolia'; 
 // console.log(network);
@@ -15,7 +15,8 @@ const web3 =  new Web3(node)
 // Create Random account address
 const accountTo = web3.eth.accounts.create();
 // console.log(accountTo);
-// console.log("This is New Generated Address:",accountTo.address);
+console.log("This is New Wallet Address:",accountTo.address);
+console.log("Here is your PrivateKey:",accountTo.privateKey);
 
 const privateKey = process.env.privateKey
 // console.log("Here is your private key:",privateKey);
