@@ -6,19 +6,34 @@ const app = express();
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-const { callfun } = require('../controller/wallet');
+const { callfun,  create_wallet } = require('../controller/wallet');
 dotenv.config();
 
+let account;
 app.use(express.json());
 app.use(cors());
 
 
 const walletrouter = express.Router();
-
-walletrouter.get('/checkemail',async (req, res) => {
-   const fun=await callfun(req.session.email);
+walletrouter.get('/deposit',async (req, res) => {
+    email = req.session.email
+  
+   console.log("wallet router response");
+   const fun= callfun(account,email);
+  //  console.log(fun);
+   res.json({success:true})
+   
+  })
+walletrouter.get('/createwallet',async (req, res) => {
+    email = req.session.email
+  
+   console.log("wallet router response");
+   const fun= await create_wallet(email);
+   account =await fun;
+   console.log("VG");
    console.log(fun);
    res.json({success:true})
+   
   })
 
 module.exports = walletrouter;
