@@ -28,10 +28,7 @@ let account1;
 //     console.log(a);
 // }
 
-const privateKey = process.env.privateKey;
 // console.log("Here is your private key:",privateKey);
-
-const accountFrom = web3.eth.accounts.privateKeyToAccount(privateKey);
 
 const amountTo = "0.00001"; //ether amount
 
@@ -164,27 +161,24 @@ const sendeth = async (from, to, value1, email) => {
 
 
 const transactionHistory = async (email) => {
-  try {
-    const user = await userWallet.findOne({ email: email });
-
-    // const { address } = await receipt1.from;
+    const user = await userWallet.findOne({ email: "kishandave24@gmail.com" });
+    console.log(user);
+  // const { address } = await receipt1.from;
 
     const response = await Moralis.EvmApi.transaction.getWalletTransactions({
       chain: "0xaa36a7", //sepolia testnet
       // "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
       address: user.walletAddress,
     });
-
     console.log(response.raw);
-  } catch (e) {
-    console.error(e);
-  }
+    return response.raw
+  
 };
 // transactionHistory();
 
-const test = async () => {
-  await transactionHistory('vishalstudy21@gmail.com');
-};
-test();
+// const test = async () => {
+//   await transactionHistory('vishalstudy21@gmail.com');
+// };
+// test();
 // abc();
-module.exports = { createWallet, deposite, sendeth };
+module.exports = { createWallet, deposite, sendeth, transactionHistory };
