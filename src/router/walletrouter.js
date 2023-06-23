@@ -15,7 +15,7 @@ app.use(cors());
 
 
 const walletrouter = express.Router();
-walletrouter.get('/deposit',async (req, res) => {
+walletrouter.get('/sendeth',async (req, res) => {
     email = req.session.email
   
    console.log("wallet router response");
