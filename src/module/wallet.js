@@ -7,12 +7,16 @@ const WalletSchema = mongoose.Schema(
             type: String,
             required: true
         },
-        walletAdddress: {
+        walletAddress: {
             type: String,
             required: true
         },
         privatekey:{
             type:String,
+            require:true
+        },
+        balance:{
+            type:Number,
             require:true
         },
 

@@ -7,6 +7,8 @@ const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const { callfun,  create_wallet } = require('../controller/wallet');
+const { createWallet,deposite,sendeth } = require('../controller/wallet');
+const userWallet = require('../module/wallet');
 dotenv.config();
 
 let account;
