@@ -20,7 +20,6 @@ const web3 = new Web3(node)
 
 const privateKey = process.env.privateKey
 // console.log("Here is your private key:",privateKey);
-
 const accountFrom = web3.eth.accounts.privateKeyToAccount(privateKey);
 
 
