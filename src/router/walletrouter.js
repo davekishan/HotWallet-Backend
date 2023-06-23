@@ -46,9 +46,12 @@ walletrouter.post('/sendeth',async (req, res) => {
  walletrouter.get('/getinfo',async(req,res)=>{
   const user=await userWallet.findOne({email:req.session.email})
   const network = 'sepolia' // use rinkeby testnet
-  const provider = ethers.getDefaultProvider(network)
+  const provider =await ethers.getDefaultProvider(network)
   console.log(user)
-  const balance=ethers.utils.formatEther(await provider.getBalance(user?.walletAddress))
+  const balance=await provider.getBalance(user?.walletAddress)
+  console.log(typeof(balance))
+ // const balance1=ethers.utils.formatEther((await provider.getBalance(user?.walletAddress)))
+
   
    res.json({success:true,balance:balance.toString(),address:user.walletAddress})
   
