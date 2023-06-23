@@ -6,7 +6,7 @@ const app = express();
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
-const { createWallet,deposite,sendeth } = require('../controller/wallet');
+const { createWallet,deposite,sendeth, transactionHistory } = require('../controller/wallet');
 const userWallet = require('../module/wallet');
 const ethers=require('ethers');
 dotenv.config();
@@ -52,6 +52,14 @@ walletrouter.post('/sendeth',async (req, res) => {
 
   
    res.json({success:true,balance:balance.toString(),address:user.walletAddress})
+  
+ })
+
+
+ 
+ walletrouter.get('/gethistory',async(req,res)=>{
+  const user=await transactionHistory({email:req.session.email})
+  res.json({success:true,history:user})
   
  })
 
