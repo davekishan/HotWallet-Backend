@@ -21,7 +21,7 @@ loginrouter.post('/login', async (req, res) => {
 
   const session = await UserSession.find({ "email": email });
 
-   
+  console.log(user)
   if (user[0]?.status == 1) {
 
     if (user[0]?.email == email && bcrypt.compareSync(password, user[0].password)) {

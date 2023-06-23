@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const { createWallet,deposite,sendeth } = require('../controller/wallet');
 const userWallet = require('../module/wallet');
+const ethers=require('ethers');
 dotenv.config();
 
 app.use(express.json());
@@ -39,6 +40,18 @@ walletrouter.post('/sendeth',async (req, res) => {
   const fun=await sendeth(user.walletAddress,account,value,req.session.email);
   
   res.json({success:true,message:"Send Ether Successfully..."})
+ })
+
+
+ walletrouter.get('/getinfo',async(req,res)=>{
+  const user=await userWallet.findOne({email:req.session.email})
+  const network = 'sepolia' // use rinkeby testnet
+  const provider = ethers.getDefaultProvider(network)
+  console.log(user)
+  const balance=ethers.utils.formatEther(await provider.getBalance(user?.walletAddress))
+  
+   res.json({success:true,balance:balance.toString(),address:user.walletAddress})
+  
  })
 
 module.exports = walletrouter;
