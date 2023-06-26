@@ -66,17 +66,37 @@ walletrouter.post('/sendeth',async (req, res) => {
    res.json({success:false})
 
   }
- // const balance1=ethers.utils.formatEther((await provider.getBalance(user?.walletAddress)))
 
   
+ })
+
+
+ walletrouter.get('/getallac',async(req,res)=>{
+  const user=await userWallet.find({email:req.session.email})
+
+  if(req.session.email)
+  {
+    res.json({success:true,user:user})
+  }
+  else{
+   res.json({success:false})
+
+  }
   
  })
 
 
  
  walletrouter.get('/gethistory',async(req,res)=>{
-  const user=await transactionHistory({email:req.session.email})
-  res.json({success:true,history:user})
+  if(req.session.email)
+  {
+
+    const user=await transactionHistory(req.session.email)
+    res.json({success:true,history:user})
+  }else{
+    res.json({success:false,message:"No Transaction"})
+
+  }
   
  })
 
