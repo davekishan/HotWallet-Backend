@@ -34,24 +34,41 @@ walletrouter.post('/deposite',async (req, res) => {
  
 walletrouter.post('/sendeth',async (req, res) => {
   const {account,value}=req.body;
-  const user=await userWallet.findOne({email:req.session.email})
-  console.log(req.session.email);
-  console.log(user);
-  const fun=await sendeth(user.walletAddress,account,value,req.session.email);
-  
-  res.json({success:true,message:"Send Ether Successfully..."})
+  if(account && value)
+  {
+
+    const user=await userWallet.findOne({email:req.session.email})
+    console.log(req.session.email);
+    console.log(user);
+    const fun=await sendeth(user.walletAddress,account,value,req.session.email);
+    
+    res.json({success:true,message:"Send Ether Successfully..."})
+  }
+  else
+  {
+    res.json({success:false,message:"Something Went Wrong..."})
+  }
  })
 
 
  walletrouter.get('/getinfo',async(req,res)=>{
   const user=await userWallet.findOne({email:req.session.email})
-  const network = 'sepolia' // use rinkeby testnet
-  const provider =await ethers.getDefaultProvider(network)
-  const balance=await provider.getBalance(user?.walletAddress)
+
+  if(req.session.email)
+  {
+
+    const network = 'sepolia' // use rinkeby testnet
+    const provider =await ethers.getDefaultProvider(network)
+    const balance=await provider.getBalance(user?.walletAddress)
+    res.json({success:true,balance:balance.toString(),address:user.walletAddress})
+  }
+  else{
+   res.json({success:false})
+
+  }
  // const balance1=ethers.utils.formatEther((await provider.getBalance(user?.walletAddress)))
 
   
-   res.json({success:true,balance:balance.toString(),address:user.walletAddress})
   
  })
 
