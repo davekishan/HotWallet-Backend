@@ -19,7 +19,7 @@ const WalletSchema = mongoose.Schema(
             type:Number,
             require:true
         },
-
+        
     }
 )
 

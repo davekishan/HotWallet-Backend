@@ -159,22 +159,20 @@ const sendeth = async (from, to, value1, email) => {
 
 // --------------------------------FETCH ERC 20  TRANSFERS-------------------------------------
 
-
 const transactionHistory = async (email) => {
-    const user = await userWallet.findOne({ email: "kishandave24@gmail.com" });
-    console.log(user);
+  console.log("this is email:", email);
+  const user = await userWallet.findOne({ email: email });
+  console.log(user);
   // const { address } = await receipt1.from;
 
-    const response = await Moralis.EvmApi.transaction.getWalletTransactions({
-      chain: "0xaa36a7", //sepolia testnet
-      // "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
-      address: user.walletAddress,
-    });
-    console.log(response.raw);
-    return response.raw
-  
+  const response = await Moralis.EvmApi.transaction.getWalletTransactions({
+    chain: "0xaa36a7", //sepolia testnet
+    // "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+    address: user.walletAddress,
+  });
+  console.log(response.raw);
+  return response.raw;
 };
-// transactionHistory();
 
 // const test = async () => {
 //   await transactionHistory('vishalstudy21@gmail.com');
