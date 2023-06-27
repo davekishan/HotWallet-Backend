@@ -33,16 +33,14 @@ walletrouter.post('/deposite',async (req, res) => {
 
  
 walletrouter.post('/sendeth',async (req, res) => {
-  const {account,value}=req.body;
-  if(account && value)
+  const {account,value,from}=req.body;
+  if(account && value && from)
   {
 
-    const user=await userWallet.findOne({email:req.session.email})
-    console.log(req.session.email);
-    console.log(user);
+    const user=await userWallet.findOne({email:req.session.email,walletAddress:from})
     const fun=await sendeth(user.walletAddress,account,value,req.session.email);
     
-    res.json({success:true,message:"Send Ether Successfully..."})
+    res.json({success:true,message:fun})
   }
   else
   {
@@ -86,12 +84,12 @@ walletrouter.post('/sendeth',async (req, res) => {
  })
 
 
- 
- walletrouter.get('/gethistory',async(req,res)=>{
+ walletrouter.get('/gethistory/:address',async(req,res)=>{
+  console.log(req.params.address)
   if(req.session.email)
   {
 
-    const user=await transactionHistory(req.session.email)
+    const user=await transactionHistory(req.params.address)
     res.json({success:true,history:user})
   }else{
     res.json({success:false,message:"No Transaction"})
