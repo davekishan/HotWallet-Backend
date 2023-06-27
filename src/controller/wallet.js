@@ -152,23 +152,20 @@ const sendeth = async (from, to, value1, email) => {
     console.log("This is transaction hash: ", receipt.transactionHash);
     console.log("Done");
     receipt1 = receipt;
+    return "Complete"
   } else {
-    console.log("Balance is low");
+    return "Balance Is Low"
   }
 };
 
 // --------------------------------FETCH ERC 20  TRANSFERS-------------------------------------
 
-const transactionHistory = async (email) => {
-  console.log("this is email:", email);
-  const user = await userWallet.findOne({ email: email });
-  console.log(user);
-  // const { address } = await receipt1.from;
-
+const transactionHistory = async (address) => {
+ 
   const response = await Moralis.EvmApi.transaction.getWalletTransactions({
     chain: "0xaa36a7", //sepolia testnet
     // "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
-    address: user.walletAddress,
+    address: address,
   });
   console.log(response.raw);
   return response.raw;
