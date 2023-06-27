@@ -4,7 +4,7 @@ require("dotenv").config();
 Moralis.start({
   apiKey: process.env.MORALIS_API_KEY,
 });
-console.log("this is moralis api key:", process.env.MORALIS_API_KEY);
+// console.log("this is moralis api key:", process.env.MORALIS_API_KEY);
 
 const Web3 = require("web3");
 const userWallet = require("../module/wallet");
