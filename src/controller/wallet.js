@@ -14,12 +14,10 @@ const apikey = process.env["apiKey"];
 // const network  =  'goerli';
 // const network = "sepolia";
 const network = "polygon-mumbai";
-// https://polygon-mumbai.infura.io/v3/fbae842a3a8643d0bf23c966f4e35325
-// console.log(network);
+
 // const node = `https://polygon-mumbai.infura.io/v3/fbae842a3a8643d0bf23c966f4e35325`;
-const node = `https://${network}.infura.io/v3/${apikey}`;
+const node = `https://${network}.infura.io/v3/${apikey}`; 
 const web3 = new Web3(node);
-// console.log(web3)
 
 // Create Random account address
 let account1;
