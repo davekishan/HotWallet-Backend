@@ -111,6 +111,67 @@ const createWallet = (email) => {
 let receipt1;
 
 const sendeth = async (from, to, value1, email) => {
+
+  const network = "sepolia";
+  const node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
+  const web3 = new Web3(node);
+
+  const account = await userWallet.findOne({
+    email: email,
+    walletAddress: from,
+  });
+  const value = web3.utils.toWei(value1, "ether");
+  const rawTx1 = {
+    to: to,
+    value: value,
+  };
+
+  const estimatefees = await web3.eth.estimateGas(rawTx1);
+
+  const rawTx = {
+    to: to,
+    value: value,
+    gas: estimatefees,
+  };
+  console.log("Fees is :", estimatefees, "value is :", value);
+  console.log(parseInt(estimatefees) + parseInt(value));
+
+  console.log(account);
+
+  if (
+    web3.utils.toWei(account.balance.toString(), "ether") >
+    parseInt(estimatefees) + parseInt(value)
+  ) {
+    const signedtx = await web3.eth.accounts.signTransaction(
+      rawTx,
+      account.privatekey
+    );
+    const receipt = await web3.eth.sendSignedTransaction(
+      signedtx.rawTransaction
+    ); // send signed transaction
+    console.log("receipt"); // sign transaction
+
+    await userWallet.findOneAndUpdate(
+      { email: email, walletAdddress: account },
+      { $inc: { balance: -value } }
+    );
+    console.log(receipt);
+    console.log("This is transaction hash: ", receipt.transactionHash);
+    console.log("Done");
+    receipt1 = receipt;
+    return "Complete";
+  } else {
+    return "Balance Is Low";
+  }
+};
+
+
+const sendpolygon= async (from, to, value1, email) => {
+
+  const network = "polygon-mumbai";
+  const node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
+  const web3 = new Web3(node);
+
   const account = await userWallet.findOne({
     email: email,
     walletAddress: from,
@@ -176,4 +237,4 @@ const transactionHistory = async (address) => {
 // };
 // test();
 // abc();
-module.exports = { createWallet, deposite, sendeth, transactionHistory };
+module.exports = { createWallet, deposite, sendeth, transactionHistory,sendpolygon };
