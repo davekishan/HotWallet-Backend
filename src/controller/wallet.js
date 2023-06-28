@@ -12,9 +12,11 @@ const userModel = require("../module/Usermodel");
 const apikey = process.env["apiKey"];
 // console.log(apikey)
 // const network  =  'goerli';
-const network = "sepolia";
+// const network = "sepolia";
+const network = "polygon-mumbai";
+// https://polygon-mumbai.infura.io/v3/fbae842a3a8643d0bf23c966f4e35325
 // console.log(network);
-
+// const node = `https://polygon-mumbai.infura.io/v3/fbae842a3a8643d0bf23c966f4e35325`;
 const node = `https://${network}.infura.io/v3/${apikey}`;
 const web3 = new Web3(node);
 // console.log(web3)
@@ -152,25 +154,23 @@ const sendeth = async (from, to, value1, email) => {
     console.log("This is transaction hash: ", receipt.transactionHash);
     console.log("Done");
     receipt1 = receipt;
-    return "Complete"
+    return "Complete";
   } else {
-    return "Balance Is Low"
+    return "Balance Is Low";
   }
 };
 
 // --------------------------------FETCH ERC 20  TRANSFERS-------------------------------------
 
 const transactionHistory = async (address) => {
- 
   const response = await Moralis.EvmApi.transaction.getWalletTransactions({
     chain: "0xaa36a7", //sepolia testnet
-    // "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+    // chain: "0x13881", //polygon testnet
     address: address,
   });
   console.log(response.raw);
   return response.raw;
 };
-
 // const test = async () => {
 //   await transactionHistory('vishalstudy21@gmail.com');
 // };
