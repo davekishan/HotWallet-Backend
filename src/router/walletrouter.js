@@ -3,14 +3,13 @@ const cors = require("cors");
 const UserSession = require("../module/SessionModel");
 const userModel = require("../module/Usermodel");
 const app = express();
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const {
   createWallet,
   deposite,
   sendeth,
   transactionHistory,
+  sendpolygon,
 } = require("../controller/wallet");
 const userWallet = require("../module/wallet");
 const ethers = require("ethers");
@@ -35,22 +34,30 @@ walletrouter.post("/deposite", async (req, res) => {
 });
 
 walletrouter.post("/sendeth", async (req, res) => {
-  const { account, value, from } = req.body;
-  console.log(account, value, from);
-  console.log("account,value,from");
-  if (account && value && from) {
-    const user = await userWallet.findOne({
-      email: req.session.email,
-      walletAddress: from,
-    });
-    const fun = await sendeth(
-      user.walletAddress,
-      account,
-      value,
-      req.session.email
-    );
+  const { account, value, from,chain } = req.body;
+  console.log(account, value, from,chain)
+  var message;
+  if (account && value && from && chain) {
+    if(chain == '0xaa36a7')
+    {
+      message = await sendeth(
+        from,
+        account,
+        value,
+        req.session.email
+      );
+    }else if(chain == "0x13881"){
+      message = await sendpolygon(
+        from,
+        account,
+        value,
+        req.session.email
+      );
+    }else{
+      message="Select Chain Please"
+    }
 
-    res.json({ success: true, message: fun });
+    res.json({ success: true, message: message });
   } else {
     res.json({ success: false, message: "Something Went Wrong..." });
   }
