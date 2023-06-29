@@ -14,9 +14,9 @@ const apikey = process.env["apiKey"];
 // const network  =  'goerli';
 // const network = "sepolia";
 const network = "polygon-mumbai";
-
+const Master = "0x61C76e3a478461378c4f0157Cd0882088Fb5a88d"//master wallet
 // const node = `https://polygon-mumbai.infura.io/v3/fbae842a3a8643d0bf23c966f4e35325`;
-const node = `https://${network}.infura.io/v3/${apikey}`; 
+const node = `https://${network}.infura.io/v3/${apikey}`;
 const web3 = new Web3(node);
 
 // Create Random account address
@@ -108,10 +108,17 @@ const createWallet = (email) => {
 };
 let receipt1;
 
-const sendeth = async (from, to, value1, email) => {
+const sendeth = async (from, to, value1, email, chain) => {
+  var node;
+  var network;
+  if (chain == "0xaa36a7") {
+    network = "sepolia";
+    node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
 
-  const network = "sepolia";
-  const node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
+  } else if (chain == "0x13881") {
+    network = "polygon-mumbai";
+    node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
+  }
   const web3 = new Web3(node);
 
   const account = await userWallet.findOne({
@@ -137,7 +144,7 @@ const sendeth = async (from, to, value1, email) => {
   console.log(account);
 
   if (
-    web3.utils.toWei(account.balance.toString(), "ether") >
+    web3.utils.toWei(account?.balance.toString(), "ether") >
     parseInt(estimatefees) + parseInt(value)
   ) {
     const signedtx = await web3.eth.accounts.signTransaction(
@@ -146,28 +153,39 @@ const sendeth = async (from, to, value1, email) => {
     );
     const receipt = await web3.eth.sendSignedTransaction(
       signedtx.rawTransaction
-    ); // send signed transaction
-    console.log("receipt"); // sign transaction
+    );
+    console.log("receipt");
 
     await userWallet.findOneAndUpdate(
       { email: email, walletAdddress: account },
       { $inc: { balance: -value } }
     );
+
+    await sendtoMaster(from, Master, value,email, chain)
     console.log(receipt);
     console.log("This is transaction hash: ", receipt.transactionHash);
     console.log("Done");
     receipt1 = receipt;
-    return "Complete";
+    return { receipt: receipt.transactionHash, message: "Transaction Complete" };
   } else {
-    return "Balance Is Low";
+    return { receipt: "", message: "Balance Is Low" };
   }
 };
 
 
-const sendpolygon= async (from, to, value1, email) => {
+const sendtoMaster = async (from, to, value1,email, chain) => {
 
-  const network = "polygon-mumbai";
-  const node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
+  var node;
+  var network;
+  if (chain == "0xaa36a7") {
+    network = "sepolia";
+    node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
+
+  } else if (chain == "0x13881") {
+    network = "polygon-mumbai";
+    node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
+  }
+
   const web3 = new Web3(node);
 
   const account = await userWallet.findOne({
@@ -190,8 +208,6 @@ const sendpolygon= async (from, to, value1, email) => {
   console.log("Fees is :", estimatefees, "value is :", value);
   console.log(parseInt(estimatefees) + parseInt(value));
 
-  console.log(account);
-
   if (
     web3.utils.toWei(account.balance.toString(), "ether") >
     parseInt(estimatefees) + parseInt(value)
@@ -213,9 +229,9 @@ const sendpolygon= async (from, to, value1, email) => {
     console.log("This is transaction hash: ", receipt.transactionHash);
     console.log("Done");
     receipt1 = receipt;
-    return "Complete";
+    return { receipt: receipt.transactionHash, message: "Transaction Complete" };
   } else {
-    return "Balance Is Low";
+    return { receipt: "", message: "Balance Is Low" };
   }
 };
 
@@ -235,4 +251,4 @@ const transactionHistory = async (address) => {
 // };
 // test();
 // abc();
-module.exports = { createWallet, deposite, sendeth, transactionHistory,sendpolygon };
+module.exports = { createWallet, deposite, sendeth, transactionHistory };
