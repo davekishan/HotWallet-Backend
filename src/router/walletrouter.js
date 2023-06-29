@@ -38,26 +38,15 @@ walletrouter.post("/sendeth", async (req, res) => {
   console.log(account, value, from,chain)
   var message;
   if (account && value && from && chain) {
-    if(chain == '0xaa36a7')
-    {
+    
       message = await sendeth(
         from,
         account,
         value,
-        req.session.email
+        req.session.email,chain
       );
-    }else if(chain == "0x13881"){
-      message = await sendpolygon(
-        from,
-        account,
-        value,
-        req.session.email
-      );
-    }else{
-      message="Select Chain Please"
-    }
 
-    res.json({ success: true, message: message });
+      res.json({ success: true, message: message.message,hash:message.receipt,chain:chain });
   } else {
     res.json({ success: false, message: "Something Went Wrong..." });
   }
