@@ -161,7 +161,6 @@ const sendeth = async (from, to, value1, email, chain) => {
       { $inc: { balance: -value } }
     );
 
-    await sendtoMaster(from, Master, value,email, chain)
     console.log(receipt);
     console.log("This is transaction hash: ", receipt.transactionHash);
     console.log("Done");
@@ -251,4 +250,4 @@ const transactionHistory = async (address) => {
 // };
 // test();
 // abc();
-module.exports = { createWallet, deposite, sendeth, transactionHistory };
+module.exports = { createWallet, deposite, sendeth, transactionHistory,sendtoMaster };
