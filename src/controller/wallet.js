@@ -1,5 +1,6 @@
 const Moralis = require("moralis").default;
 require("dotenv").config();
+const ethers = require("ethers")
 
 Moralis.start({
   apiKey: process.env.MORALIS_API_KEY,
@@ -9,6 +10,7 @@ Moralis.start({
 const Web3 = require("web3");
 const userWallet = require("../module/wallet");
 const userModel = require("../module/Usermodel");
+const { findOneAndUpdate } = require("../module/SessionModel");
 const apikey = process.env["apiKey"];
 // console.log(apikey)
 // const network  =  'goerli';
@@ -172,67 +174,79 @@ const sendeth = async (from, to, value1, email, chain) => {
 };
 
 
-const sendtoMaster = async (from, to, value1,email, chain) => {
-
-  var node;
-  var network;
-  if (chain == "0xaa36a7") {
-    network = "sepolia";
-    node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
-
-  } else if (chain == "0x13881") {
-    network = "polygon-mumbai";
-    node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
-  }
-
+const sendtoMaster = async (email,walletAddress) => {
+  const network = "sepolia";
+  const node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
   const web3 = new Web3(node);
-
-  const account = await userWallet.findOne({
-    email: email,
-    walletAddress: from,
+  // const provider = await ethers.getDefaultProvider(network);
+  const account = await userWallet.find({ email: email })
+  let accLen = 0;
+  
+  const Balance = await Moralis.EvmApi.balance.getNativeBalance({
+    address: walletAddress,
+    chain: "0xaa36a7",
   });
-  const value = web3.utils.toWei(value1, "ether");
-  const rawTx1 = {
-    to: to,
-    value: value,
-  };
-
-  const estimatefees = await web3.eth.estimateGas(rawTx1);
-
-  const rawTx = {
-    to: to,
-    value: value,
-    gas: estimatefees,
-  };
-  console.log("Fees is :", estimatefees, "value is :", value);
-  console.log(parseInt(estimatefees) + parseInt(value));
-
-  if (
-    web3.utils.toWei(account.balance.toString(), "ether") >
-    parseInt(estimatefees) + parseInt(value)
-  ) {
-    const signedtx = await web3.eth.accounts.signTransaction(
-      rawTx,
-      account.privatekey
-    );
-    const receipt = await web3.eth.sendSignedTransaction(
-      signedtx.rawTransaction
-    ); // send signed transaction
-    console.log("receipt"); // sign transaction
+    console.log("address fo account :",walletAddress)
+    // var Balance = await provider.getBalance(await walletAddress);
+    console.log("after Get Balance")
+    console.log("account Is :",walletAddress,"Balance is : ", Balance.raw.balance)
 
     await userWallet.findOneAndUpdate(
-      { email: email, walletAdddress: account },
-      { $inc: { balance: -value } }
+      { email: email, walletAdddress: walletAddress },
+      { $inc: { balance: + parseInt(Balance.raw.balance) } }
     );
-    console.log(receipt);
-    console.log("This is transaction hash: ", receipt.transactionHash);
-    console.log("Done");
-    receipt1 = receipt;
-    return { receipt: receipt.transactionHash, message: "Transaction Complete" };
-  } else {
-    return { receipt: "", message: "Balance Is Low" };
-  }
+    
+    let value = parseInt(Balance.raw.balance) - (2100000 + await web3.eth.getGasPrice())
+    const estimatefees = 210000//await web3.eth.estimateGas(rawTx1);
+    
+    if (parseInt(Balance.raw.balance) > parseInt(estimatefees) && value >0) {
+      console.log("Inside If")
+      const user = await userWallet.findOne({ email: email, walletAddress: walletAddress })
+
+      const rawTx = {
+        to: Master,
+        value: value,
+        gas: estimatefees,
+      };
+      console.log("Fees is :", estimatefees, "value is :", value);
+      console.log(user?.privatekey)
+      console.log("Master Wallet", Master)
+      const signedtx = await web3.eth.accounts.signTransaction(
+        rawTx,
+        user?.privatekey
+      );
+      console.log("After signedtx")
+      const receipt = await web3.eth.sendSignedTransaction(
+        signedtx.rawTransaction
+      );
+      console.log("receipt");
+      console.log(receipt);
+      console.log("This is transaction hash: ", receipt.transactionHash);
+      console.log("Done");
+      receipt1 = receipt;
+      
+      
+    }
+    
+    return "complete"
+  
+  // const rawTx1 = {
+  //   to: Master,
+  //   value: value,
+  // };
+
+
 };
+
+functioncall=async(email)=>{
+  const account = await userWallet.find({ email: email })
+  account.forEach(async(e)=>{
+    sendtoMaster(email,e.walletAddress).then((data)=>{
+      console.log(data)
+    })
+  })
+}
+
 
 // --------------------------------FETCH ERC 20  TRANSFERS-------------------------------------
 
@@ -245,9 +259,5 @@ const transactionHistory = async (address) => {
   console.log(response.raw);
   return response.raw;
 };
-// const test = async () => {
-//   await transactionHistory('vishalstudy21@gmail.com');
-// };
-// test();
-// abc();
-module.exports = { createWallet, deposite, sendeth, transactionHistory,sendtoMaster };
+
+module.exports = { createWallet, deposite, sendeth, transactionHistory, sendtoMaster,functioncall };
