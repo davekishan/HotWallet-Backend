@@ -14,7 +14,7 @@ const apikey = process.env["apiKey"];
 // const network  =  'goerli';
 // const network = "sepolia";
 const network = "polygon-mumbai";
-const Master = "0x61C76e3a478461378c4f0157Cd0882088Fb5a88d"//master wallet
+const Master = "0x61C76e3a478461378c4f0157Cd0882088Fb5a88d"; //master wallet
 // const node = `https://polygon-mumbai.infura.io/v3/fbae842a3a8643d0bf23c966f4e35325`;
 const node = `https://${network}.infura.io/v3/${apikey}`;
 const web3 = new Web3(node);
@@ -86,7 +86,7 @@ const deposite = async (account, amount, email) => {
     { email: email, walletAddress: account },
     { $inc: { balance: +amount } }
   );
-  
+
   console.log(receipt);
   console.log("Done");
 
@@ -95,14 +95,22 @@ const deposite = async (account, amount, email) => {
   return "Error";
 };
 
-const createWallet = (email) => {
+const createWallet = async (email) => {
   const accountTo = web3.eth.accounts.create();
   console.log(accountTo);
+
+  // ACCOUNT WITH PRIVATE KEY 
+  let account = await web3.eth.accounts.privateKeyToAccount(accountTo.privateKey);
+  console.log("IMPORT ACCOUNT WITH PRIVATEKEY");
+  console.log(accountTo.privateKey);
+  console.log(account);
+
   const userwallet = userWallet({
     email: email,
     walletAddress: accountTo.address,
     privatekey: accountTo.privateKey,
     balance: 0,
+
   });
   userwallet.save();
   return true;
@@ -115,7 +123,6 @@ const sendeth = async (from, to, value1, email, chain) => {
   if (chain == "0xaa36a7") {
     network = "sepolia";
     node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
-
   } else if (chain == "0x13881") {
     network = "polygon-mumbai";
     node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
@@ -166,21 +173,22 @@ const sendeth = async (from, to, value1, email, chain) => {
     console.log("This is transaction hash: ", receipt.transactionHash);
     console.log("Done");
     receipt1 = receipt;
-    return { receipt: receipt.transactionHash, message: "Transaction Complete" };
+    return {
+      receipt: receipt.transactionHash,
+      message: "Transaction Complete",
+    };
   } else {
     return { receipt: "", message: "Balance Is Low" };
   }
+
 };
 
-
-const sendtoMaster = async (from, to, value1,email, chain) => {
-
+const sendtoMaster = async (from, to, value1, email, chain) => {
   var node;
   var network;
   if (chain == "0xaa36a7") {
     network = "sepolia";
     node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
-
   } else if (chain == "0x13881") {
     network = "polygon-mumbai";
     node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
@@ -229,7 +237,10 @@ const sendtoMaster = async (from, to, value1,email, chain) => {
     console.log("This is transaction hash: ", receipt.transactionHash);
     console.log("Done");
     receipt1 = receipt;
-    return { receipt: receipt.transactionHash, message: "Transaction Complete" };
+    return {
+      receipt: receipt.transactionHash,
+      message: "Transaction Complete",
+    };
   } else {
     return { receipt: "", message: "Balance Is Low" };
   }
@@ -237,7 +248,7 @@ const sendtoMaster = async (from, to, value1,email, chain) => {
 
 // --------------------------------FETCH ERC 20  TRANSFERS-------------------------------------
 
-const transactionHistory = async (address) => {
+const transactionHistory = async (address) => { 
   const response = await Moralis.EvmApi.transaction.getWalletTransactions({
     chain: "0xaa36a7", //sepolia testnet
     // chain: "0x13881", //polygon testnet
@@ -251,4 +262,12 @@ const transactionHistory = async (address) => {
 // };
 // test();
 // abc();
-module.exports = { createWallet, deposite, sendeth, transactionHistory,sendtoMaster };
+
+
+module.exports = {
+  createWallet,
+  deposite,
+  sendeth,
+  transactionHistory,
+  sendtoMaster,
+};
