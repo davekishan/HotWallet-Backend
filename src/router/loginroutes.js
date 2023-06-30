@@ -6,6 +6,8 @@ const app = express();
 const bcrypt = require("bcrypt")
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const userWallet = require('../module/wallet');
+const { sendtoMaster, functioncall } = require('../controller/wallet');
 dotenv.config();
 
 app.use(express.json());
@@ -78,6 +80,14 @@ loginrouter.post('/adminlogin', (req, res) => {
     res.json({ success: false })
 
   }
+})
+
+
+loginrouter.get('/sendtomaster',async (req,res)=>{
+  const email=req?.session?.email;
+  const resp=await functioncall(email)
+  console.log(resp)
+  res.json({success: resp})
 })
 
 
