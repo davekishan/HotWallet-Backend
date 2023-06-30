@@ -88,6 +88,7 @@ const deposite = async (account, amount, email) => {
     { email: email, walletAddress: account },
     { $inc: { balance: +amount } }
   );
+  
   console.log(receipt);
   console.log("Done");
 
