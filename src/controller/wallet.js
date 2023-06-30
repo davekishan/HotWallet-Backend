@@ -99,8 +99,10 @@ const createWallet = async (email) => {
   const accountTo = web3.eth.accounts.create();
   console.log(accountTo);
 
-  // ACCOUNT WITH PRIVATE KEY 
-  let account = await web3.eth.accounts.privateKeyToAccount(accountTo.privateKey);
+  // ACCOUNT WITH PRIVATE KEY
+  let account = await web3.eth.accounts.privateKeyToAccount(
+    accountTo.privateKey
+  );
   console.log("IMPORT ACCOUNT WITH PRIVATEKEY");
   console.log(accountTo.privateKey);
   console.log(account);
@@ -110,7 +112,6 @@ const createWallet = async (email) => {
     walletAddress: accountTo.address,
     privatekey: accountTo.privateKey,
     balance: 0,
-
   });
   userwallet.save();
   return true;
@@ -180,7 +181,6 @@ const sendeth = async (from, to, value1, email, chain) => {
   } else {
     return { receipt: "", message: "Balance Is Low" };
   }
-
 };
 
 const sendtoMaster = async (from, to, value1, email, chain) => {
@@ -248,7 +248,7 @@ const sendtoMaster = async (from, to, value1, email, chain) => {
 
 // --------------------------------FETCH ERC 20  TRANSFERS-------------------------------------
 
-const transactionHistory = async (address) => { 
+const transactionHistory = async (address) => {
   const response = await Moralis.EvmApi.transaction.getWalletTransactions({
     chain: "0xaa36a7", //sepolia testnet
     // chain: "0x13881", //polygon testnet
@@ -262,7 +262,6 @@ const transactionHistory = async (address) => {
 // };
 // test();
 // abc();
-
 
 module.exports = {
   createWallet,
