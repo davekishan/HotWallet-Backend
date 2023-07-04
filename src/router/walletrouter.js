@@ -7,7 +7,6 @@ const {
   deposite,
   sendeth,
   transactionHistory,
-
 } = require("../controller/wallet");
 const userWallet = require("../module/wallet");
 const ethers = require("ethers");
@@ -21,7 +20,11 @@ const walletrouter = express.Router();
 walletrouter.get("/createwallet", async (req, res) => {
   const fun = await createWallet(req.session.email);
   console.log(fun);
-  res.json({ success: true, message: "Account Created..",address :fun.address });
+  res.json({
+    success: true,
+    message: "Account Created..",
+    address: fun.address,
+  });
 });
 
 walletrouter.post("/deposite", async (req, res) => {
@@ -32,19 +35,18 @@ walletrouter.post("/deposite", async (req, res) => {
 });
 
 walletrouter.post("/sendeth", async (req, res) => {
-  const { account, value, from,chain } = req.body;
-  console.log(account, value, from,chain)
+  const { account, value, from, chain } = req.body;
+  console.log(account, value, from, chain);
   var message;
   if (account && value && from && chain) {
-    
-      message = await sendeth(
-        from,
-        account,
-        value,
-        req.session.email,chain
-      );
+    message = await sendeth(from, account, value, req.session.email, chain);
 
-      res.json({ success: true, message: message.message,hash:message.receipt,chain:chain });
+    res.json({
+      success: true,
+      message: message.message,
+      hash: message.receipt,
+      chain: chain,
+    });
   } else {
     res.json({ success: false, message: "Something Went Wrong..." });
   }
@@ -89,7 +91,10 @@ walletrouter.get("/gethistory/:address", async (req, res) => {
 
 walletrouter.get("/getbalance/:address", async (req, res) => {
   if (req.session.email) {
-    const user = await userWallet.findOne({email:req.session.email,walletAddress:req.params.address})
+    const user = await userWallet.findOne({
+      email: req.session.email,
+      walletAddress: req.params.address,
+    });
     res.json({ success: true, balance: user.balance });
   } else {
     res.json({ success: false, message: "No Balance" });

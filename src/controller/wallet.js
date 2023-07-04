@@ -90,7 +90,6 @@ const deposite = async (account, amount, email) => {
     { $inc: { balance: +amount } }
   );
 
-
   console.log(receipt);
   console.log("Done");
 
@@ -101,7 +100,7 @@ const deposite = async (account, amount, email) => {
 
 const createWallet = (email) => {
   const accountTo = web3.eth.accounts.create();
-  console.log(accountTo);
+  // console.log(accountTo);
   const userwallet = userWallet({
     email: email,
     walletAddress: accountTo.address,
@@ -124,10 +123,10 @@ const sendeth = async (from, to, value1, email, chain) => {
     node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
   }
   const web3 = new Web3(node);
-  // const account = await userWallet.findOne({
-  //   email: email,
-  //   walletAddress: from,
-  // });
+  const account = await userWallet.findOne({
+    email: email,
+    walletAddress: from,
+  });
   const value = web3.utils.toWei(value1, "ether");
   const rawTx1 = {
     to: to,
@@ -144,13 +143,10 @@ const sendeth = async (from, to, value1, email, chain) => {
   console.log("Fees is :", estimatefees, "value is :", value);
   console.log(parseInt(estimatefees) + parseInt(value));
 
-  if (
-    account.balance >
-    parseInt(estimatefees) + parseInt(value)
-  ) {
+  if (account.balance > parseInt(estimatefees) + parseInt(value)) {
     const signedtx = await web3.eth.accounts.signTransaction(
       rawTx,
-      process.env['MasterPrivateKey']
+      process.env["MasterPrivateKey"]
     );
     const receipt = await web3.eth.sendSignedTransaction(
       signedtx.rawTransaction
@@ -162,122 +158,119 @@ const sendeth = async (from, to, value1, email, chain) => {
       { $inc: { balance: -value } }
     );
 
-  console.log(receipt);
-  console.log("This is transaction hash: ", receipt.transactionHash);
-  console.log("Done");
-  receipt1 = receipt;
-  return {
-    receipt: receipt.transactionHash,
-    message: "Transaction Complete",
-  };
-  //   } else {
-  //     return { receipt: "", message: "Balance Is Low" };
-  //   }
-};
-
-const sendtoMaster = async (from, to, value1, email, chain) => {
-  var node;
-  var network;
-  if (chain == "0xaa36a7") {
-    network = "sepolia";
-    node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
-  } else if (chain == "0x13881") {
-    network = "polygon-mumbai";
-    node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
-  }
-
-const sendtoMaster = async (email, walletAddress) => {
-  const network = "sepolia";
-  const node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
-  const web3 = new Web3(node);
-  // const provider = await ethers.getDefaultProvider(network);
-  // const account = await userWallet.find({ email: email })
-  // let accLen = 0;
-
-  const Balance = await Moralis.EvmApi.balance.getNativeBalance({
-    address: walletAddress,
-    chain: "0xaa36a7",
-  });
-  console.log("address fo account :", walletAddress)
-  // var Balance = await provider.getBalance(await walletAddress);
-  console.log("after Get Balance")
-  console.log("account Is :", walletAddress, "Balance is : ", Balance.raw.balance)
-
-
-
-  const gasPrice = await web3.eth.getGasPrice();
-  const gasLimit = 210000;
-  const gasFee = gasPrice * gasLimit;
-
-  let value = parseInt(Balance.raw.balance) - gasFee
-  const estimatefees = 210000//await web3.eth.estimateGas(rawTx1);
-
-
-  if (parseInt(Balance.raw.balance) > parseInt(estimatefees) && value > 0) {
-    console.log("Inside If")
-    const user = await userWallet.findOne({ email: email, walletAddress: walletAddress })
-
-    const rawTx = {
-      to: Master,
-      value: value,
-      gas: gasLimit,
-    };
-    console.log("Fees is :", estimatefees, "value is :", value);
-    const signedtx = await web3.eth.accounts.signTransaction(
-      rawTx,
-      user?.privatekey
-    );
-    console.log("After signedtx")
-    const receipt = await web3.eth.sendSignedTransaction(
-      signedtx.rawTransaction
-    );
-    await userWallet.findOneAndUpdate(
-      { email: email, walletAddress: walletAddress },
-      { $inc: { balance: value } }
-    );
-    console.log("receipt");
     console.log(receipt);
     console.log("This is transaction hash: ", receipt.transactionHash);
     console.log("Done");
     receipt1 = receipt;
-
-
-    return "complete"
+    return {
+      receipt: receipt.transactionHash,
+      message: "Transaction Complete",
+    };
   }
-
-
-  // const rawTx1 = {
-  //   to: Master,
-  //   value: value,
-  // };
-
-};
-
-functioncall = async (email) => {
-  const account = await userWallet.find({ email: email })
-  for (const e of account) {
-    const data = await sendtoMaster(email, e.walletAddress);
-    console.log(data);
-    // await sendtoMaster(email,e.walletAddress).then((data)=>{
-    //   console.log(data)
-    // })
+  else {
+    return { receipt: "", message: "Balance Is Low" };
   }
-  return "Success"
-
-
 }
+  
+    const sendtoMaster = async (email, walletAddress) => {
+      const network = "sepolia";
+      const node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
+      const web3 = new Web3(node);
+      // const provider = await ethers.getDefaultProvider(network);
+      // const account = await userWallet.find({ email: email })
+      // let accLen = 0;
+
+      const Balance = await Moralis.EvmApi.balance.getNativeBalance({
+        address: walletAddress,
+        chain: "0xaa36a7",
+      });
+      console.log("address fo account :", walletAddress);
+      // var Balance = await provider.getBalance(await walletAddress);
+      console.log("after Get Balance");
+      console.log(
+        "account Is :",
+        walletAddress,
+        "Balance is : ",
+        Balance.raw.balance
+      );
+
+      const gasPrice = await web3.eth.getGasPrice();
+      const gasLimit = 210000;
+      const gasFee = gasPrice * gasLimit;
+
+      let value = parseInt(Balance.raw.balance) - gasFee;
+      const estimatefees = 210000; //await web3.eth.estimateGas(rawTx1);
+
+      if (parseInt(Balance.raw.balance) > parseInt(estimatefees) && value > 0) {
+        console.log("Inside If");
+        const user = await userWallet.findOne({
+          email: email,
+          walletAddress: walletAddress,
+        });
+
+        const rawTx = {
+          to: Master,
+          value: value,
+          gas: gasLimit,
+        };
+        console.log("Fees is :", estimatefees, "value is :", value);
+        const signedtx = await web3.eth.accounts.signTransaction(
+          rawTx,
+          user?.privatekey
+        );
+        console.log("After signedtx");
+        const receipt = await web3.eth.sendSignedTransaction(
+          signedtx.rawTransaction
+        );
+        await userWallet.findOneAndUpdate(
+          { email: email, walletAddress: walletAddress },
+          { $inc: { balance: value } }
+        );
+        console.log("receipt");
+        console.log(receipt);
+        console.log("This is transaction hash: ", receipt.transactionHash);
+        console.log("Done");
+        receipt1 = receipt;
+
+        return "complete";
+      }
+
+      // const rawTx1 = {
+      //   to: Master,
+      //   value: value,
+      // };
+    };
+
+    functioncall = async (email) => {
+      const account = await userWallet.find({ email: email });
+      for (const e of account) {
+        const data = await sendtoMaster(email, e.walletAddress);
+        console.log(data);
+        // await sendtoMaster(email,e.walletAddress).then((data)=>{
+        //   console.log(data)
+        // })
+      }
+      return "Success";
+    };
+
+    // --------------------------------FETCH ERC 20  TRANSFERS-------------------------------------
+
+    const transactionHistory = async (address) => {
+      const response = await Moralis.EvmApi.transaction.getWalletTransactions({
+        chain: "0xaa36a7", //sepolia testnet
+        // chain: "0x13881", //polygon testnet
+        address: address,
+      });
+      console.log(response.raw);
+      return response.raw;
+    };
 
 
-// --------------------------------FETCH ERC 20  TRANSFERS-------------------------------------
-
-const transactionHistory = async (address) => {
-  const response = await Moralis.EvmApi.transaction.getWalletTransactions({
-    chain: "0xaa36a7", //sepolia testnet
-    // chain: "0x13881", //polygon testnet
-    address: address,
-  });
-  console.log(response.raw);
-  return response.raw;
+module.exports = {
+  createWallet,
+  deposite,
+  sendeth,
+  transactionHistory,
+  sendtoMaster,
+  functioncall,
 };
-
-module.exports = { createWallet, deposite, sendeth, transactionHistory, sendtoMaster, functioncall };
