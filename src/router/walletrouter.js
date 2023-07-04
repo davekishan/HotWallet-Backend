@@ -87,4 +87,13 @@ walletrouter.get("/gethistory/:address", async (req, res) => {
   }
 });
 
+walletrouter.get("/getbalance/:address", async (req, res) => {
+  if (req.session.email) {
+    const user = await userWallet.findOne({email:req.session.email,walletAddress:req.params.address})
+    res.json({ success: true, balance: user.balance });
+  } else {
+    res.json({ success: false, message: "No Balance" });
+  }
+});
+
 module.exports = walletrouter;
