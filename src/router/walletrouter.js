@@ -1,7 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const UserSession = require("../module/SessionModel");
-const userModel = require("../module/Usermodel");
 const app = express();
 const dotenv = require("dotenv");
 const {
@@ -9,7 +7,7 @@ const {
   deposite,
   sendeth,
   transactionHistory,
-  sendpolygon,
+
 } = require("../controller/wallet");
 const userWallet = require("../module/wallet");
 const ethers = require("ethers");
@@ -23,7 +21,7 @@ const walletrouter = express.Router();
 walletrouter.get("/createwallet", async (req, res) => {
   const fun = await createWallet(req.session.email);
   console.log(fun);
-  res.json({ success: true, message: "Account Created.." });
+  res.json({ success: true, message: "Account Created..",address :fun.address });
 });
 
 walletrouter.post("/deposite", async (req, res) => {
