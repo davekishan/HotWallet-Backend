@@ -182,16 +182,7 @@ const sendeth = async (from, to, value1, email, chain) => {
   }
 };
 
-const sendtoMaster = async (from, to, value1, email, chain) => {
-  var node;
-  var network;
-  if (chain == "0xaa36a7") {
-    network = "sepolia";
-    node = `https://${network}.infura.io/v3/${process.env["apiKeySepolia"]}`;
-  } else if (chain == "0x13881") {
-    network = "polygon-mumbai";
-    node = `https://${network}.infura.io/v3/${process.env["apiKeyPolygon"]}`;
-  }
+
 
 const sendtoMaster = async (email, walletAddress) => {
   const network = "sepolia";
@@ -292,4 +283,4 @@ const transactionHistory = async (address) => {
 // test();
 // abc();
 
-module.exports = { createWallet, deposite, sendeth, transactionHistory, sendtoMaster, functioncall };
+module.exports = { createWallet, deposite, sendeth, transactionHistory, sendtoMaster, functioncall }
